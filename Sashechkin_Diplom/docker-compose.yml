@@ -1,0 +1,12 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: simple-support-backend
+    env_file:
+      - ./.env
+    volumes:
+      - ./backend/data:/app/data
+    ports:
+      - '8000:8000'
+    restart: unless-stopped

@@ -1,0 +1,1 @@
+SMTPDataError: (550, b'spam message rejected. Please visit https://help.mail.ru/notspam-support/id?c=MkQzjxr5SQNt9C945JBcNbprqnkUVVZU4Z8Rogv9RBpgopyPW9ZL0CQAAACTjwEAfXUmEA~~ or  report details to abuse@corp.mail.ru. Error code: 8F3344320349F91A782FF46D355C90E479AA6BBA54565514A2119FE11A44FD0B8F9CA260D04BD65B. ID: 0000002400018F931026757D.')

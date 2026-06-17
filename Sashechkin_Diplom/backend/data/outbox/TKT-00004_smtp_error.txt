@@ -1,0 +1,1 @@
+SMTPRecipientsRefused: {'test@example.com': (550, b'non-local recipient verification failed')}

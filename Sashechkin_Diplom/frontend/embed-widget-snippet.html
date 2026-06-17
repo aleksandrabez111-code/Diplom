@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Простой встраиваемый виджет</title>
+  </head>
+  <body>
+    <h2>Пример страницы</h2>
+    <div class="page-logo-wrap">
+      <img class="page-logo" src="assets/logo.jpg" alt="Логотип" />
+    </div>
+    <style>
+      .page-logo-wrap {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        margin: 8px 0 24px;
+      }
+
+      .page-logo {
+        width: 360px;
+        max-width: 80vw;
+        height: auto;
+        display: block;
+      }
+
+      #simple-support-widget-btn {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        z-index: 99999;
+        padding: 10px 14px;
+        border: 0;
+        border-radius: 10px;
+        background: #1d4ed8;
+        color: #fff;
+        font: 600 14px/1.2 Arial, sans-serif;
+        cursor: pointer;
+      }
+      #simple-support-widget-panel {
+        position: fixed;
+        right: 16px;
+        bottom: 64px;
+        width: 340px;
+        max-width: calc(100vw - 24px);
+        z-index: 99999;
+        display: none;
+        border: 1px solid #d1d5db;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+        font: 14px/1.4 Arial, sans-serif;
+      }
+      #simple-support-widget-panel .head {
+        padding: 10px 12px;
+        background: #f3f4f6;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #simple-support-widget-panel .body {
+        padding: 12px;
+      }
+      #simple-support-widget-panel input,
+      #simple-support-widget-panel textarea,
+      #simple-support-widget-panel select,
+      #simple-support-widget-panel button {
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 8px;
+        padding: 8px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font: 14px Arial, sans-serif;
+      }
+      #simple-support-widget-panel button {
+        cursor: pointer;
+        background: #1d4ed8;
+        border-color: #1d4ed8;
+        color: #fff;
+        font-weight: 600;
+      }
+      #simple-support-widget-result {
+        margin-top: 10px;
+        font-size: 13px;
+      }
+    </style>
+
+    <button id="simple-support-widget-btn" type="button">Подать обращение</button>
+
+    <div id="simple-support-widget-panel">
+      <div class="head">
+        <strong>Поддержка</strong>
+        <button id="simple-support-widget-close" type="button" style="width:auto;padding:4px 8px;margin:0;background:#111827;color:#fff;border-color:#111827;">×</button>
+      </div>
+      <div class="body">
+        <label>Тема</label>
+        <select id="simple-support-topic"></select>
+
+        <label>Текст вопроса</label>
+        <textarea id="simple-support-message" rows="4" placeholder="Опишите ваш вопрос"></textarea>
+
+        <label>Email</label>
+        <input id="simple-support-email" type="email" placeholder="example@mail.ru" />
+
+        <button id="simple-support-send" type="button">Отправить</button>
+        <div id="simple-support-widget-result"></div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        var API_BASE = window.SIMPLE_SUPPORT_API_BASE || (
+          window.location.protocol.indexOf('http') === 0
+            ? window.location.protocol + '//' + window.location.hostname + ':8000/api'
+            : 'http://localhost:8000/api'
+        );
+
+        var openBtn = document.getElementById('simple-support-widget-btn');
+        var panel = document.getElementById('simple-support-widget-panel');
+        var closeBtn = document.getElementById('simple-support-widget-close');
+        var sendBtn = document.getElementById('simple-support-send');
+        var topicSelect = document.getElementById('simple-support-topic');
+        var messageInput = document.getElementById('simple-support-message');
+        var emailInput = document.getElementById('simple-support-email');
+        var resultBox = document.getElementById('simple-support-widget-result');
+
+        function setResult(text, isError) {
+          resultBox.textContent = text;
+          resultBox.style.color = isError ? '#b91c1c' : '#166534';
+        }
+
+        function fallbackApiBases() {
+          var bases = [API_BASE];
+          if (window.location.protocol.indexOf('http') === 0) {
+            for (var port = 8000; port <= 8009; port++) {
+              var base = window.location.protocol + '//' + window.location.hostname + ':' + port + '/api';
+              if (bases.indexOf(base) === -1) bases.push(base);
+            }
+          }
+          return bases;
+        }
+
+        async function request(path, options) {
+          var lastError = null;
+          var bases = fallbackApiBases();
+          for (var i = 0; i < bases.length; i++) {
+            try {
+              var res = await fetch(bases[i] + path, options || {});
+              var data = await res.json().catch(function () { return null; });
+              if (!res.ok) {
+                throw new Error((data && data.detail) || 'Ошибка запроса');
+              }
+              API_BASE = bases[i];
+              return data;
+            } catch (e) {
+              lastError = e;
+              if (!(e instanceof TypeError)) {
+                throw e;
+              }
+            }
+          }
+
+          if (lastError instanceof TypeError) {
+            throw new Error('Backend недоступен. Запустите start_app.ps1 и обновите страницу.');
+          }
+          throw lastError || new Error('Ошибка запроса');
+        }
+
+        async function loadTopics() {
+          try {
+            var topics = await request('/public/topics');
+            topicSelect.innerHTML = '';
+            for (var i = 0; i < topics.length; i++) {
+              var option = document.createElement('option');
+              option.value = topics[i].id;
+              option.textContent = topics[i].name;
+              topicSelect.appendChild(option);
+            }
+          } catch (e) {
+            setResult(e.message || 'Не удалось загрузить темы', true);
+          }
+        }
+
+        function togglePanel(show) {
+          panel.style.display = show ? 'block' : 'none';
+          if (show) {
+            loadTopics();
+          }
+        }
+
+        openBtn.addEventListener('click', function () {
+          togglePanel(panel.style.display !== 'block');
+        });
+
+        closeBtn.addEventListener('click', function () {
+          togglePanel(false);
+        });
+
+        sendBtn.addEventListener('click', async function () {
+          var message = messageInput.value.trim();
+          var email = emailInput.value.trim();
+          var topicId = Number(topicSelect.value);
+
+          if (!topicId || message.length < 5 || !email.includes('@')) {
+            setResult('Заполните тему, текст (от 5 символов) и email', true);
+            return;
+          }
+
+          sendBtn.disabled = true;
+          setResult('Отправка...', false);
+
+          try {
+            var data = await request('/public/tickets', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                topic_id: topicId,
+                message_text: message,
+                contact_email: email
+              })
+            });
+
+            setResult('Заявка отправлена. Номер: ' + data.ticket_number, false);
+            messageInput.value = '';
+            emailInput.value = '';
+          } catch (e) {
+            setResult(e.message || 'Ошибка отправки', true);
+          } finally {
+            sendBtn.disabled = false;
+          }
+        });
+      })();
+    </script>
+    <!-- END: COPY THIS BLOCK TO ANY HTML TEMPLATE -->
+  </body>
+</html>

@@ -1,0 +1,1284 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Панель заявок</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4f7fb;
+        --surface: #ffffff;
+        --surface-2: #eef4f8;
+        --text: #17202a;
+        --muted: #677483;
+        --line: #dbe4ea;
+        --accent: #126d7a;
+        --accent-dark: #0d5360;
+        --danger: #b3261e;
+        --warning: #a05a00;
+        --success: #247246;
+        --shadow: 0 16px 40px rgba(32, 50, 68, 0.11);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, "Segoe UI", Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        min-height: 38px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        padding: 8px 14px;
+        background: var(--accent);
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      button:hover { background: var(--accent-dark); }
+      button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+      .button-secondary {
+        background: #fff;
+        border-color: var(--line);
+        color: var(--text);
+      }
+
+      .button-secondary:hover { background: var(--surface-2); }
+
+      .button-danger {
+        background: var(--danger);
+      }
+
+      .button-danger:hover {
+        background: #8f1f18;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        min-height: 38px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 8px 10px;
+        background: #fff;
+        color: var(--text);
+      }
+
+      textarea {
+        min-height: 84px;
+        resize: vertical;
+      }
+
+      label {
+        display: grid;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--muted);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0;
+        background: #f9fbfc;
+      }
+
+      .page {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 260px minmax(0, 1fr);
+      }
+
+      .sidebar {
+        background: #102931;
+        color: #eef9fb;
+        padding: 24px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+
+      .brand {
+        display: grid;
+        gap: 4px;
+      }
+
+      .brand-title {
+        font-size: 20px;
+        font-weight: 800;
+      }
+
+      .brand-subtitle {
+        color: #a9c5cc;
+        font-size: 13px;
+      }
+
+      .tabs {
+        display: grid;
+        gap: 8px;
+      }
+
+      .tab {
+        width: 100%;
+        justify-content: flex-start;
+        background: transparent;
+        color: #d9edf1;
+        border-color: transparent;
+        text-align: left;
+      }
+
+      .tab:hover,
+      .tab.active {
+        background: #21414a;
+      }
+
+      .profile {
+        margin-top: auto;
+        display: grid;
+        gap: 10px;
+        color: #c2dce1;
+        font-size: 13px;
+      }
+
+      .main {
+        min-width: 0;
+        padding: 28px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 22px;
+      }
+
+      .title {
+        margin: 0;
+        font-size: 28px;
+        line-height: 1.2;
+      }
+
+      .subtitle {
+        margin-top: 6px;
+        color: var(--muted);
+      }
+
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+      }
+
+      .panel + .panel {
+        margin-top: 18px;
+      }
+
+      .panel-head {
+        padding: 18px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .panel-title {
+        margin: 0;
+        font-size: 17px;
+      }
+
+      .panel-body {
+        padding: 18px;
+      }
+
+      .toolbar,
+      .form-grid,
+      .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: end;
+      }
+
+      .form-grid label {
+        flex: 1 1 190px;
+      }
+
+      .toolbar > * {
+        width: auto;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(140px, 1fr));
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .stat {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 16px;
+      }
+
+      .stat-value {
+        font-size: 26px;
+        font-weight: 800;
+      }
+
+      .stat-label {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .login-shell {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+
+      .login-panel {
+        width: min(760px, 100%);
+        display: grid;
+        grid-template-columns: minmax(220px, 0.75fr) minmax(280px, 1fr);
+        overflow: hidden;
+      }
+
+      .login-intro {
+        padding: 30px;
+        background: #102931;
+        color: #eef9fb;
+      }
+
+      .login-intro h1 {
+        margin: 0 0 10px;
+        font-size: 30px;
+        line-height: 1.12;
+      }
+
+      .login-intro p {
+        margin: 0;
+        color: #bdd8dd;
+        line-height: 1.55;
+      }
+
+      .login-form {
+        padding: 30px;
+        background: #fff;
+        display: grid;
+        gap: 14px;
+      }
+
+      .hidden { display: none !important; }
+
+      .message {
+        min-height: 22px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .message.error { color: var(--danger); }
+      .message.success { color: var(--success); }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 26px;
+        padding: 4px 9px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .badge.new {
+        color: #7a3d00;
+        background: #fff2d8;
+      }
+
+      .badge.in_progress {
+        color: #0d5360;
+        background: #dff3f6;
+      }
+
+      .badge.closed {
+        color: #245d3b;
+        background: #e1f3e8;
+      }
+
+      .role {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      .message-cell {
+        max-width: 360px;
+        min-width: 220px;
+        line-height: 1.45;
+      }
+
+      .compact-input {
+        min-width: 180px;
+      }
+
+      select[multiple].compact-input,
+      #topic-specialist {
+        min-height: 104px;
+      }
+
+      .topic-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .topic-actions button {
+        min-width: 104px;
+      }
+
+      .checkbox-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text);
+        font-size: 14px;
+      }
+
+      .checkbox-label input {
+        width: 18px;
+        min-height: 18px;
+      }
+
+      @media (max-width: 900px) {
+        .page {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: static;
+        }
+
+        .tabs {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .stats {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .login-panel {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 560px) {
+        .main {
+          padding: 18px;
+        }
+
+        .topbar,
+        .panel-head {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .stats {
+          grid-template-columns: 1fr;
+        }
+
+        .tabs {
+          grid-template-columns: 1fr;
+        }
+
+        .toolbar > *,
+        .actions button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="login-screen" class="login-shell">
+      <section class="panel login-panel" aria-label="Вход">
+        <div class="login-intro">
+          <h1>Панель заявок</h1>
+          <p>Рабочее место администратора и специалистов службы поддержки.</p>
+        </div>
+        <div class="login-form">
+          <label>
+            API
+            <input id="api-base" autocomplete="off" />
+          </label>
+          <label>
+            Логин
+            <input id="login" value="admin" autocomplete="username" />
+          </label>
+          <label>
+            Пароль
+            <input id="password" type="password" value="admin12345" autocomplete="current-password" />
+          </label>
+          <button id="login-btn">Войти</button>
+          <div id="login-result" class="message"></div>
+        </div>
+      </section>
+    </div>
+
+    <div id="app" class="page hidden">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-title">Панель заявок</div>
+          <div class="brand-subtitle">FastAPI + SQLite</div>
+        </div>
+        <nav class="tabs" aria-label="Разделы">
+          <button class="tab active" data-tab="tickets">Заявки</button>
+          <button class="tab" data-tab="topics">Темы</button>
+          <button class="tab" data-tab="users" data-admin-only="true">Пользователи</button>
+        </nav>
+        <div class="profile">
+          <div id="me-line"></div>
+          <button id="logout-btn" class="button-secondary">Выйти</button>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="topbar">
+          <div>
+            <h2 id="page-title" class="title">Заявки</h2>
+            <div id="page-subtitle" class="subtitle">Обработка обращений пользователей</div>
+          </div>
+          <button id="refresh-btn" class="button-secondary">Обновить</button>
+        </div>
+
+        <section id="tickets-view" data-view="tickets">
+          <div class="stats">
+            <div class="stat">
+              <div id="stat-total" class="stat-value">0</div>
+              <div class="stat-label">Всего</div>
+            </div>
+            <div class="stat">
+              <div id="stat-new" class="stat-value">0</div>
+              <div class="stat-label">Новые</div>
+            </div>
+            <div class="stat">
+              <div id="stat-progress" class="stat-value">0</div>
+              <div class="stat-label">В работе</div>
+            </div>
+            <div class="stat">
+              <div id="stat-closed" class="stat-value">0</div>
+              <div class="stat-label">Закрытые</div>
+            </div>
+          </div>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3 class="panel-title">Список заявок</h3>
+              <div class="toolbar">
+                <select id="status-filter" aria-label="Фильтр по статусу">
+                  <option value="">Все статусы</option>
+                  <option value="new">Новые</option>
+                  <option value="in_progress">В работе</option>
+                  <option value="closed">Закрытые</option>
+                </select>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Номер</th>
+                    <th>Тема</th>
+                    <th>Статус</th>
+                    <th>Email</th>
+                    <th>Специалист</th>
+                    <th>Сообщение</th>
+                    <th>Действия</th>
+                  </tr>
+                </thead>
+                <tbody id="tickets-body"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section id="topics-view" class="hidden" data-view="topics">
+          <section class="panel" id="topic-create-panel">
+            <div class="panel-head">
+              <h3 class="panel-title">Новая тема</h3>
+            </div>
+            <div class="panel-body">
+              <div class="form-grid">
+                <label>
+                  Название
+                  <input id="topic-name" placeholder="Например, Запись к врачу" />
+                </label>
+                <label>
+                  Специалисты
+                  <select id="topic-specialist" multiple size="4"></select>
+                </label>
+                <label class="checkbox-label">
+                  <input id="topic-active" type="checkbox" checked />
+                  Активна
+                </label>
+                <button id="create-topic-btn">Создать</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3 class="panel-title">Темы обращений</h3>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Название</th>
+                    <th>Специалисты</th>
+                    <th>Активна</th>
+                    <th id="topics-actions-title">Действия</th>
+                  </tr>
+                </thead>
+                <tbody id="topics-body"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <section id="users-view" class="hidden" data-view="users">
+          <section class="panel">
+            <div class="panel-head">
+              <h3 class="panel-title">Новый пользователь</h3>
+            </div>
+            <div class="panel-body">
+              <div class="form-grid">
+                <label>
+                  Логин
+                  <input id="user-username" placeholder="spec3" />
+                </label>
+                <label>
+                  Пароль
+                  <input id="user-password" type="password" placeholder="не менее 8 символов" />
+                </label>
+                <label>
+                  ФИО
+                  <input id="user-full-name" placeholder="Фамилия Имя" />
+                </label>
+                <label>
+                  Email
+                  <input id="user-email" type="email" placeholder="user@example.com" />
+                </label>
+                <label>
+                  Роль
+                  <select id="user-role">
+                    <option value="specialist">Специалист</option>
+                    <option value="admin">Администратор</option>
+                  </select>
+                </label>
+                <label class="checkbox-label">
+                  <input id="user-active" type="checkbox" checked />
+                  Активен
+                </label>
+                <button id="create-user-btn">Создать</button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3 class="panel-title">Пользователи</h3>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Логин</th>
+                    <th>ФИО</th>
+                    <th>Email</th>
+                    <th>Роль</th>
+                    <th>Активен</th>
+                    <th>Новый пароль</th>
+                    <th>Действия</th>
+                  </tr>
+                </thead>
+                <tbody id="users-body"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+
+        <div id="app-message" class="message"></div>
+      </main>
+    </div>
+
+    <script>
+      (function () {
+        var token = localStorage.getItem('support_token') || null;
+        var me = null;
+        var currentTab = 'tickets';
+        var tickets = [];
+        var topics = [];
+        var specialists = [];
+        var users = [];
+
+        var titles = {
+          tickets: ['Заявки', 'Обработка обращений пользователей'],
+          topics: ['Темы', 'Настройка направлений и ответственных специалистов'],
+          users: ['Пользователи', 'Управление администраторами и специалистами']
+        };
+
+        var loginScreen = document.getElementById('login-screen');
+        var app = document.getElementById('app');
+        var apiBaseInput = document.getElementById('api-base');
+        var loginInput = document.getElementById('login');
+        var passwordInput = document.getElementById('password');
+        var loginBtn = document.getElementById('login-btn');
+        var loginResult = document.getElementById('login-result');
+        var logoutBtn = document.getElementById('logout-btn');
+        var meLine = document.getElementById('me-line');
+        var refreshBtn = document.getElementById('refresh-btn');
+        var appMessage = document.getElementById('app-message');
+        var pageTitle = document.getElementById('page-title');
+        var pageSubtitle = document.getElementById('page-subtitle');
+        var statusFilter = document.getElementById('status-filter');
+        var ticketsBody = document.getElementById('tickets-body');
+        var topicsBody = document.getElementById('topics-body');
+        var usersBody = document.getElementById('users-body');
+        var topicCreatePanel = document.getElementById('topic-create-panel');
+        var topicsActionsTitle = document.getElementById('topics-actions-title');
+
+        function defaultApiBase() {
+          if (window.location.protocol.indexOf('http') === 0) {
+            return window.location.protocol + '//' + window.location.hostname + ':8000/api';
+          }
+          return 'http://localhost:8000/api';
+        }
+
+        apiBaseInput.value = localStorage.getItem('support_api_base') || defaultApiBase();
+
+        function apiBase() {
+          return apiBaseInput.value.trim().replace(/\/$/, '');
+        }
+
+        function fallbackApiBases() {
+          var bases = [apiBase()];
+          if (window.location.protocol.indexOf('http') === 0) {
+            for (var port = 8000; port <= 8009; port++) {
+              var base = window.location.protocol + '//' + window.location.hostname + ':' + port + '/api';
+              if (bases.indexOf(base) === -1) bases.push(base);
+            }
+          }
+          return bases;
+        }
+
+        function setMessage(target, text, type) {
+          target.textContent = text || '';
+          target.className = 'message' + (type ? ' ' + type : '');
+        }
+
+        function setAuthUi(isLoggedIn) {
+          loginScreen.classList.toggle('hidden', isLoggedIn);
+          app.classList.toggle('hidden', !isLoggedIn);
+        }
+
+        function isAdmin() {
+          return me && me.role === 'admin';
+        }
+
+        function roleLabel(role) {
+          return role === 'admin' ? 'Администратор' : 'Специалист';
+        }
+
+        function statusLabel(status) {
+          if (status === 'new') return 'Новая';
+          if (status === 'in_progress') return 'В работе';
+          if (status === 'closed') return 'Закрыта';
+          return status;
+        }
+
+        function formatDate(value) {
+          if (!value) return '';
+          return new Intl.DateTimeFormat('ru-RU', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          }).format(new Date(value));
+        }
+
+        function createCell(text, className) {
+          var td = document.createElement('td');
+          if (className) td.className = className;
+          td.textContent = text == null ? '' : String(text);
+          return td;
+        }
+
+        function createBadge(status) {
+          var span = document.createElement('span');
+          span.className = 'badge ' + status;
+          span.textContent = statusLabel(status);
+          return span;
+        }
+
+        function createButton(text, className, onClick) {
+          var button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = text;
+          if (className) button.className = className;
+          button.addEventListener('click', onClick);
+          return button;
+        }
+
+        function createInput(value, type) {
+          var input = document.createElement('input');
+          input.className = 'compact-input';
+          input.type = type || 'text';
+          input.value = value || '';
+          return input;
+        }
+
+        function createCheckbox(checked) {
+          var input = document.createElement('input');
+          input.type = 'checkbox';
+          input.checked = Boolean(checked);
+          return input;
+        }
+
+        function createSpecialistSelect(selectedId, includeEmpty) {
+          var select = document.createElement('select');
+          select.className = 'compact-input';
+          if (includeEmpty) {
+            var empty = document.createElement('option');
+            empty.value = '';
+            empty.textContent = 'Не назначен';
+            select.appendChild(empty);
+          }
+          specialists.forEach(function (user) {
+            var option = document.createElement('option');
+            option.value = String(user.id);
+            option.textContent = user.full_name;
+            if (selectedId && Number(selectedId) === user.id) option.selected = true;
+            select.appendChild(option);
+          });
+          return select;
+        }
+
+        function createSpecialistMultiSelect(selectedIds) {
+          var select = document.createElement('select');
+          select.className = 'compact-input';
+          select.multiple = true;
+          select.size = Math.min(Math.max(specialists.length, 3), 6);
+          selectedIds = selectedIds || [];
+          specialists.forEach(function (user) {
+            var option = document.createElement('option');
+            option.value = String(user.id);
+            option.textContent = user.full_name;
+            option.selected = selectedIds.indexOf(user.id) !== -1;
+            select.appendChild(option);
+          });
+          return select;
+        }
+
+        function getSelectedIds(select) {
+          return Array.prototype.slice.call(select.selectedOptions).map(function (option) {
+            return Number(option.value);
+          });
+        }
+
+        async function request(path, options) {
+          var headers = Object.assign({}, (options && options.headers) || {});
+          if (token) headers.Authorization = 'Bearer ' + token;
+
+          var bases = fallbackApiBases();
+          var lastError = null;
+
+          for (var i = 0; i < bases.length; i++) {
+            try {
+              var response = await fetch(bases[i] + path, {
+                method: (options && options.method) || 'GET',
+                headers: headers,
+                body: options && options.body
+              });
+              var data = await response.json().catch(function () { return null; });
+              if (!response.ok) {
+                throw new Error((data && data.detail) || 'Ошибка запроса');
+              }
+              if (apiBaseInput.value.trim().replace(/\/$/, '') !== bases[i]) {
+                apiBaseInput.value = bases[i];
+                localStorage.setItem('support_api_base', bases[i]);
+              }
+              return data;
+            } catch (error) {
+              lastError = error;
+              if (!(error instanceof TypeError)) {
+                throw error;
+              }
+            }
+          }
+
+          if (lastError instanceof TypeError) {
+            throw new Error('Backend недоступен. Запустите start_app.ps1 и проверьте адрес API.');
+          }
+          throw lastError || new Error('Ошибка запроса');
+        }
+
+        function runAction(action) {
+          action().catch(function (error) {
+            setMessage(appMessage, error.message || 'Ошибка действия', 'error');
+          });
+        }
+
+        function updateTabs() {
+          document.querySelectorAll('[data-admin-only="true"]').forEach(function (item) {
+            item.classList.toggle('hidden', !isAdmin());
+          });
+          topicCreatePanel.classList.toggle('hidden', !isAdmin());
+          if (!isAdmin() && currentTab === 'users') showTab('tickets');
+        }
+
+        function showTab(tab) {
+          currentTab = tab;
+          document.querySelectorAll('[data-view]').forEach(function (view) {
+            view.classList.toggle('hidden', view.getAttribute('data-view') !== tab);
+          });
+          document.querySelectorAll('.tab').forEach(function (button) {
+            button.classList.toggle('active', button.getAttribute('data-tab') === tab);
+          });
+          pageTitle.textContent = titles[tab][0];
+          pageSubtitle.textContent = titles[tab][1];
+          setMessage(appMessage, '', '');
+          loadCurrentTab();
+        }
+
+        function renderStats() {
+          document.getElementById('stat-total').textContent = tickets.length;
+          document.getElementById('stat-new').textContent = tickets.filter(function (item) { return item.status === 'new'; }).length;
+          document.getElementById('stat-progress').textContent = tickets.filter(function (item) { return item.status === 'in_progress'; }).length;
+          document.getElementById('stat-closed').textContent = tickets.filter(function (item) { return item.status === 'closed'; }).length;
+        }
+
+        function renderTickets() {
+          ticketsBody.innerHTML = '';
+          renderStats();
+
+          if (!tickets.length) {
+            var empty = document.createElement('tr');
+            var emptyCell = createCell('Заявок нет');
+            emptyCell.colSpan = 7;
+            empty.appendChild(emptyCell);
+            ticketsBody.appendChild(empty);
+            return;
+          }
+
+          tickets.forEach(function (ticket) {
+            var tr = document.createElement('tr');
+            tr.appendChild(createCell(ticket.ticket_number + '\n' + formatDate(ticket.created_at)));
+            tr.appendChild(createCell(ticket.topic ? ticket.topic.name : ''));
+
+            var statusCell = document.createElement('td');
+            statusCell.appendChild(createBadge(ticket.status));
+            tr.appendChild(statusCell);
+
+            tr.appendChild(createCell(ticket.contact_email));
+            tr.appendChild(createCell(ticket.assigned_specialist ? ticket.assigned_specialist.full_name : 'Не назначен'));
+            tr.appendChild(createCell(ticket.message_text, 'message-cell'));
+
+            var actionsCell = document.createElement('td');
+            var actions = document.createElement('div');
+            actions.className = 'actions';
+
+            if (ticket.status === 'closed') {
+              actionsCell.className = 'muted';
+            } else {
+              if (me.role === 'specialist' && ticket.status === 'new') {
+                actions.appendChild(createButton('Взять', '', function () {
+                  runAction(function () { return takeTicket(ticket.id); });
+                }));
+              } else if (ticket.status !== 'in_progress') {
+                actions.appendChild(createButton('В работу', 'button-secondary', function () {
+                  runAction(function () { return updateTicketStatus(ticket.id, 'in_progress'); });
+                }));
+              }
+              actions.appendChild(createButton('Закрыть', 'button-danger', function () {
+                runAction(function () { return updateTicketStatus(ticket.id, 'closed'); });
+              }));
+              actionsCell.appendChild(actions);
+            }
+            tr.appendChild(actionsCell);
+            ticketsBody.appendChild(tr);
+          });
+        }
+
+        async function loadTickets() {
+          ticketsBody.innerHTML = '<tr><td colspan="7">Загрузка...</td></tr>';
+          var query = statusFilter.value ? '?status=' + encodeURIComponent(statusFilter.value) : '';
+          tickets = await request('/tickets' + query);
+          renderTickets();
+        }
+
+        async function takeTicket(id) {
+          await request('/tickets/' + id + '/take', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+          });
+          setMessage(appMessage, 'Заявка взята в работу', 'success');
+          await loadTickets();
+        }
+
+        async function updateTicketStatus(id, status) {
+          await request('/tickets/' + id + '/status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: status })
+          });
+          setMessage(appMessage, 'Статус обновлен', 'success');
+          await loadTickets();
+        }
+
+        function fillSpecialistSelect(select, includeEmpty) {
+          select.innerHTML = '';
+          if (includeEmpty) {
+            var empty = document.createElement('option');
+            empty.value = '';
+            empty.textContent = 'Не назначен';
+            select.appendChild(empty);
+          }
+          specialists.forEach(function (user) {
+            var option = document.createElement('option');
+            option.value = String(user.id);
+            option.textContent = user.full_name;
+            select.appendChild(option);
+          });
+        }
+
+        function fillSpecialistMultiSelect(select) {
+          select.innerHTML = '';
+          select.multiple = true;
+          select.size = Math.min(Math.max(specialists.length, 3), 6);
+          specialists.forEach(function (user) {
+            var option = document.createElement('option');
+            option.value = String(user.id);
+            option.textContent = user.full_name;
+            select.appendChild(option);
+          });
+        }
+
+        function renderTopics() {
+          topicsBody.innerHTML = '';
+          var showActions = isAdmin();
+          topicsActionsTitle.classList.toggle('hidden', !showActions);
+          fillSpecialistMultiSelect(document.getElementById('topic-specialist'));
+
+          if (!topics.length) {
+            var empty = document.createElement('tr');
+            var emptyCell = createCell('Тем нет');
+            emptyCell.colSpan = showActions ? 4 : 3;
+            empty.appendChild(emptyCell);
+            topicsBody.appendChild(empty);
+            return;
+          }
+
+          topics.forEach(function (topic) {
+            var tr = document.createElement('tr');
+            var topicSpecialists = topic.specialists && topic.specialists.length
+              ? topic.specialists
+              : (topic.specialist ? [topic.specialist] : []);
+
+            if (showActions) {
+              var nameInput = createInput(topic.name);
+              var selectedIds = topicSpecialists.map(function (user) { return user.id; });
+              var specialistsSelect = createSpecialistMultiSelect(selectedIds);
+              var activeInput = createCheckbox(topic.is_active);
+
+              var nameCell = document.createElement('td');
+              nameCell.appendChild(nameInput);
+              tr.appendChild(nameCell);
+
+              var specialistsCell = document.createElement('td');
+              specialistsCell.appendChild(specialistsSelect);
+              tr.appendChild(specialistsCell);
+
+              var activeCell = document.createElement('td');
+              activeCell.appendChild(activeInput);
+              tr.appendChild(activeCell);
+
+              var actionsCell = document.createElement('td');
+              var actions = document.createElement('div');
+              actions.className = 'topic-actions';
+              actions.appendChild(createButton('Сохранить', '', function () {
+                runAction(function () { return updateTopic(topic.id, {
+                  name: nameInput.value.trim(),
+                  specialist_ids: getSelectedIds(specialistsSelect),
+                  is_active: activeInput.checked
+                }); });
+              }));
+              actions.appendChild(createButton('Удалить', 'button-danger', function () {
+                runAction(function () { return deleteTopic(topic.id, topic.name); });
+              }));
+              actionsCell.appendChild(actions);
+              tr.appendChild(actionsCell);
+            } else {
+              tr.appendChild(createCell(topic.name));
+              tr.appendChild(createCell(topicSpecialists.length ? topicSpecialists.map(function (user) { return user.full_name; }).join(', ') : 'Не назначен'));
+              tr.appendChild(createCell(topic.is_active ? 'Да' : 'Нет'));
+            }
+            topicsBody.appendChild(tr);
+          });
+        }
+
+        async function loadTopics() {
+          if (isAdmin()) {
+            specialists = await request('/users/specialists');
+          }
+          topics = await request('/topics');
+          renderTopics();
+        }
+
+        async function createTopic() {
+          var name = document.getElementById('topic-name').value.trim();
+          var specialistIds = getSelectedIds(document.getElementById('topic-specialist'));
+          var isActive = document.getElementById('topic-active').checked;
+
+          await request('/topics', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: name,
+              specialist_ids: specialistIds,
+              is_active: isActive
+            })
+          });
+
+          document.getElementById('topic-name').value = '';
+          Array.prototype.forEach.call(document.getElementById('topic-specialist').options, function (option) {
+            option.selected = false;
+          });
+          setMessage(appMessage, 'Тема создана', 'success');
+          await loadTopics();
+        }
+
+        async function updateTopic(id, payload) {
+          await request('/topics/' + id, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          setMessage(appMessage, 'Тема сохранена', 'success');
+          await loadTopics();
+        }
+
+        async function deleteTopic(id, name) {
+          if (!confirm('Удалить тему "' + name + '"?')) return;
+          await request('/topics/' + id, { method: 'DELETE' });
+          setMessage(appMessage, 'Тема удалена', 'success');
+          await loadTopics();
+        }
+
+        function renderUsers() {
+          usersBody.innerHTML = '';
+
+          users.forEach(function (user) {
+            var tr = document.createElement('tr');
+            var fullNameInput = createInput(user.full_name);
+            var emailInput = createInput(user.email, 'email');
+            var activeInput = createCheckbox(user.is_active);
+            var passwordInput = createInput('', 'password');
+            passwordInput.placeholder = 'оставить без изменений';
+
+            tr.appendChild(createCell(user.username));
+
+            var fullNameCell = document.createElement('td');
+            fullNameCell.appendChild(fullNameInput);
+            tr.appendChild(fullNameCell);
+
+            var emailCell = document.createElement('td');
+            emailCell.appendChild(emailInput);
+            tr.appendChild(emailCell);
+
+            tr.appendChild(createCell(roleLabel(user.role)));
+
+            var activeCell = document.createElement('td');
+            activeCell.appendChild(activeInput);
+            tr.appendChild(activeCell);
+
+            var passwordCell = document.createElement('td');
+            passwordCell.appendChild(passwordInput);
+            tr.appendChild(passwordCell);
+
+            var actionsCell = document.createElement('td');
+            actionsCell.appendChild(createButton('Сохранить', '', function () {
+              var payload = {
+                full_name: fullNameInput.value.trim(),
+                email: emailInput.value.trim(),
+                is_active: activeInput.checked
+              };
+              if (passwordInput.value) payload.password = passwordInput.value;
+              updateUser(user.id, payload);
+            }));
+            tr.appendChild(actionsCell);
+
+            usersBody.appendChild(tr);
+          });
+        }
+
+        async function loadUsers() {
+          users = await request('/users');
+          renderUsers();
+        }
+
+        async function createUser() {
+          await request('/users', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: document.getElementById('user-username').value.trim(),
+              password: document.getElementById('user-password').value,
+              full_name: document.getElementById('user-full-name').value.trim(),
+              email: document.getElementById('user-email').value.trim(),
+              role: document.getElementById('user-role').value,
+              is_active: document.getElementById('user-active').checked
+            })
+          });
+          ['user-username', 'user-password', 'user-full-name', 'user-email'].forEach(function (id) {
+            document.getElementById(id).value = '';
+          });
+          setMessage(appMessage, 'Пользователь создан', 'success');
+          await loadUsers();
+          specialists = await request('/users/specialists');
+        }
+
+        async function updateUser(id, payload) {
+          await request('/users/' + id, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          setMessage(appMessage, 'Пользователь сохранен', 'success');
+          await loadUsers();
+        }
+
+        async function loadCurrentTab() {
+          try {
+            setMessage(appMessage, '', '');
+            if (currentTab === 'tickets') await loadTickets();
+            if (currentTab === 'topics') await loadTopics();
+            if (currentTab === 'users') await loadUsers();
+          } catch (error) {
+            setMessage(appMessage, error.message || 'Ошибка загрузки', 'error');
+          }
+        }
+
+        async function login() {
+          try {
+            setMessage(loginResult, 'Вход...', '');
+            localStorage.setItem('support_api_base', apiBase());
+            var data = await request('/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username: loginInput.value.trim(), password: passwordInput.value })
+            });
+            token = data.access_token;
+            me = data.user;
+            localStorage.setItem('support_token', token);
+            meLine.textContent = me.full_name + ' · ' + roleLabel(me.role);
+            setAuthUi(true);
+            updateTabs();
+            showTab('tickets');
+          } catch (error) {
+            setMessage(loginResult, error.message || 'Ошибка входа', 'error');
+          }
+        }
+
+        async function restoreSession() {
+          if (!token) {
+            setAuthUi(false);
+            return;
+          }
+          try {
+            me = await request('/auth/me');
+            meLine.textContent = me.full_name + ' · ' + roleLabel(me.role);
+            setAuthUi(true);
+            updateTabs();
+            showTab('tickets');
+          } catch (error) {
+            token = null;
+            localStorage.removeItem('support_token');
+            setAuthUi(false);
+          }
+        }
+
+        loginBtn.addEventListener('click', login);
+        passwordInput.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') login();
+        });
+        logoutBtn.addEventListener('click', function () {
+          token = null;
+          me = null;
+          localStorage.removeItem('support_token');
+          setAuthUi(false);
+          setMessage(loginResult, '', '');
+        });
+        refreshBtn.addEventListener('click', loadCurrentTab);
+        statusFilter.addEventListener('change', loadTickets);
+        document.getElementById('create-topic-btn').addEventListener('click', function () {
+          createTopic().catch(function (error) { setMessage(appMessage, error.message, 'error'); });
+        });
+        document.getElementById('create-user-btn').addEventListener('click', function () {
+          createUser().catch(function (error) { setMessage(appMessage, error.message, 'error'); });
+        });
+        document.querySelectorAll('.tab').forEach(function (button) {
+          button.addEventListener('click', function () {
+            showTab(button.getAttribute('data-tab'));
+          });
+        });
+
+        restoreSession();
+      })();
+    </script>
+  </body>
+</html>
